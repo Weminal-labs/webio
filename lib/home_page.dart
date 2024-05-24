@@ -2,11 +2,13 @@ import 'package:animate_gradient/animate_gradient.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:drag_anim/drag_anim.dart';
 import 'package:drag_anim/drag_anim_notification.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:pretty_animated_buttons/pretty_animated_buttons.dart';
+import 'package:webio/pick_upload_image.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -247,33 +249,33 @@ class _HomePageState extends State<HomePage> {
           mainAxisCellCount: 2,
           crossAxisCellCount: 3,
           widget: _getText()),
-      HomeEditCard(
-        key: 'card4',
-        mainAxisCellCount: 4,
-        crossAxisCellCount: 3,
-        widget: Text(
-          'Something',
-          style: TextStyle(fontSize: 36, color: Colors.white),
-        ),
-      ),
-      HomeEditCard(
-        key: 'card5',
-        mainAxisCellCount: 2,
-        crossAxisCellCount: 3,
-        widget: Text(
-          'Something',
-          style: TextStyle(fontSize: 36, color: Colors.white),
-        ),
-      ),
-      HomeEditCard(
-        key: 'card6',
-        mainAxisCellCount: 2,
-        crossAxisCellCount: 3,
-        widget: Text(
-          'Something',
-          style: TextStyle(fontSize: 36, color: Colors.white),
-        ),
-      ),
+      // HomeEditCard(
+      //   key: 'card4',
+      //   mainAxisCellCount: 4,
+      //   crossAxisCellCount: 3,
+      //   widget: Text(
+      //     'Something',
+      //     style: TextStyle(fontSize: 36, color: Colors.white),
+      //   ),
+      // ),
+      // HomeEditCard(
+      //   key: 'card5',
+      //   mainAxisCellCount: 2,
+      //   crossAxisCellCount: 3,
+      //   widget: Text(
+      //     'Something',
+      //     style: TextStyle(fontSize: 36, color: Colors.white),
+      //   ),
+      // ),
+      // HomeEditCard(
+      //   key: 'card6',
+      //   mainAxisCellCount: 2,
+      //   crossAxisCellCount: 3,
+      //   widget: Text(
+      //     'Something',
+      //     style: TextStyle(fontSize: 36, color: Colors.white),
+      //   ),
+      // ),
     ];
   }
 
@@ -326,6 +328,7 @@ class _HomePageState extends State<HomePage> {
                               child: Stack(
                                 children: [
                                   Container(
+                                    padding: EdgeInsets.all(8),
                                     margin: element.isHover
                                         ? EdgeInsets.zero
                                         : const EdgeInsets.all(8),
@@ -509,12 +512,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   IconButton(
                     onPressed: () {
-                      list.add(
-                        HomeEditCard(
-                            key: 'card ${list.length}',
-                            mainAxisCellCount: 1,
-                            crossAxisCellCount: 1),
-                      );
+                      _addCardItem(crossAxisCellCount: 1, mainAxisCellCount: 1);
                     },
                     icon: const Icon(
                       Icons.square_outlined,
@@ -524,24 +522,14 @@ class _HomePageState extends State<HomePage> {
                   ),
                   IconButton(
                     onPressed: () {
-                      list.add(
-                        HomeEditCard(
-                            key: 'card ${list.length}',
-                            mainAxisCellCount: 2,
-                            crossAxisCellCount: 3),
-                      );
+                      _addCardItem(crossAxisCellCount: 3, mainAxisCellCount: 2);
                     },
                     icon: const Icon(Icons.rectangle_outlined),
                     color: Colors.white,
                   ),
                   IconButton(
                     onPressed: () {
-                      list.add(
-                        HomeEditCard(
-                            key: 'card ${list.length}',
-                            mainAxisCellCount: 4,
-                            crossAxisCellCount: 3),
-                      );
+                      _addCardItem(crossAxisCellCount: 3, mainAxisCellCount: 4);
                     },
                     icon: const ImageIcon(
                       AssetImage(
@@ -558,6 +546,120 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     );
+  }
+
+  Widget _getTextCard() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TextField(
+            maxLines: null,
+            controller: TextEditingController(text: 'flamrdevs'),
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w400,
+              fontSize: 20,
+            ),
+            decoration: const InputDecoration(
+              isDense: true,
+              contentPadding: EdgeInsets.zero,
+              fillColor: Colors.transparent,
+              filled: true,
+              hoverColor: Colors.grey,
+              border: InputBorder.none,
+            ),
+          ),
+          SizedBox(
+            height: 8,
+          ),
+          TextField(
+            maxLines: null,
+            controller: TextEditingController(text: 'UI/UX designer'),
+            style: TextStyle(
+                color: Colors.white, fontWeight: FontWeight.w600, fontSize: 30),
+            decoration: const InputDecoration(
+              isDense: true,
+              contentPadding: EdgeInsets.zero,
+              fillColor: Colors.transparent,
+              filled: true,
+              hoverColor: Colors.grey,
+              border: InputBorder.none,
+            ),
+          ),
+          const SizedBox(
+            height: 16,
+          ),
+          TextField(
+            maxLines: null,
+            controller: TextEditingController(
+              text:
+                  'I am a UI/UX designer from Indonesia, specializing in creating user-centric and visually appealing digital experiences. With a focus on seamless and enjoyable interactions, I aim to enhance the overall user experience through strategic design solutions.',
+            ),
+            style: TextStyle(
+                color: Colors.white, fontWeight: FontWeight.w400, fontSize: 16),
+            decoration: const InputDecoration(
+              isDense: true,
+              contentPadding: EdgeInsets.zero,
+              fillColor: Colors.transparent,
+              filled: true,
+              hoverColor: Colors.grey,
+              border: InputBorder.none,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _addCardItem(
+      {required num mainAxisCellCount, required int crossAxisCellCount}) {
+    HomeEditCard homeEditCard = HomeEditCard(
+      key: 'card ${list.length}',
+      mainAxisCellCount: mainAxisCellCount,
+      crossAxisCellCount: crossAxisCellCount,
+    );
+    homeEditCard.widget = Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        IconButton(
+          onPressed: () {
+            setState(() {
+              homeEditCard.widget = _getTextCard();
+            });
+          },
+          icon: const Icon(
+            Icons.text_format_outlined,
+            size: 40,
+            color: Colors.white,
+          ),
+        ),
+        const SizedBox(
+          width: 8,
+        ),
+        IconButton(
+          onPressed: () async {
+            FilePickerResult? image = await pickImage();
+            if (image != null) {
+              setState(() {
+                homeEditCard.widget = Image.memory(
+                  image.files.first.bytes!,
+                  fit: BoxFit.cover,
+                );
+              });
+            }
+          },
+          icon: const Icon(
+            Icons.image_outlined,
+            size: 40,
+            color: Colors.white,
+          ),
+        ),
+      ],
+    );
+    list.add(homeEditCard);
   }
 
   int _getResize() {
@@ -577,7 +679,7 @@ class HomeEditCard {
   num mainAxisCellCount;
   int crossAxisCellCount;
   bool isHover = false;
-  final Widget? widget;
+  Widget? widget;
 
   HomeEditCard(
       {required this.key,
