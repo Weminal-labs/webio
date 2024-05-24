@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-
-import 'my_app.dart';
+import 'package:webio/home_page.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MaterialApp(
+    home: HomePage(),
+    debugShowCheckedModeBanner: false,
+  ));
 }
