@@ -9,9 +9,12 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:pretty_animated_buttons/pretty_animated_buttons.dart';
 import 'package:webio/pick_upload_image.dart';
+import 'package:webio/provider/zk_login_provider.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final ZkLoginProvider provider;
+
+  const HomePage({super.key, required this.provider});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -43,12 +46,12 @@ class _HomePageState extends State<HomePage> {
             colors: colorizeColors,
           ),
           ColorizeAnimatedText(
-            'Webio',
+            '${(widget.provider.balance ?? BigInt.zero) / BigInt.from(10).pow(9)} SUI',
             textStyle: colorizeTextStyle,
             colors: colorizeColors,
           ),
           ColorizeAnimatedText(
-            'PhatLH - HienPhan',
+            widget.provider.address,
             textStyle: colorizeTextStyle,
             colors: colorizeColors,
           ),
@@ -85,71 +88,8 @@ class _HomePageState extends State<HomePage> {
           crossAxisCellCount: 3,
           widget: Container(
             width: double.maxFinite,
-            padding: EdgeInsets.all(16),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TextField(
-                  maxLines: null,
-                  controller: TextEditingController(text: 'flamrdevs'),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w400,
-                    fontSize: 20,
-                  ),
-                  decoration: const InputDecoration(
-                    isDense: true,
-                    contentPadding: EdgeInsets.zero,
-                    fillColor: Colors.transparent,
-                    filled: true,
-                    hoverColor: Colors.grey,
-                    border: InputBorder.none,
-                  ),
-                ),
-                SizedBox(
-                  height: 8,
-                ),
-                TextField(
-                  maxLines: null,
-                  controller: TextEditingController(text: 'UI/UX designer'),
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 30),
-                  decoration: const InputDecoration(
-                    isDense: true,
-                    contentPadding: EdgeInsets.zero,
-                    fillColor: Colors.transparent,
-                    filled: true,
-                    hoverColor: Colors.grey,
-                    border: InputBorder.none,
-                  ),
-                ),
-                const SizedBox(
-                  height: 16,
-                ),
-                TextField(
-                  maxLines: null,
-                  controller: TextEditingController(
-                    text:
-                        'I am a UI/UX designer from Indonesia, specializing in creating user-centric and visually appealing digital experiences. With a focus on seamless and enjoyable interactions, I aim to enhance the overall user experience through strategic design solutions.',
-                  ),
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w400,
-                      fontSize: 16),
-                  decoration: const InputDecoration(
-                    isDense: true,
-                    contentPadding: EdgeInsets.zero,
-                    fillColor: Colors.transparent,
-                    filled: true,
-                    hoverColor: Colors.grey,
-                    border: InputBorder.none,
-                  ),
-                ),
-              ],
-            ),
+            padding: const EdgeInsets.all(16),
+            child: _getTextCard(),
           )),
       HomeEditCard(
           key: 'card2',
@@ -549,67 +489,74 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _getTextCard() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          TextField(
-            maxLines: null,
-            controller: TextEditingController(text: 'flamrdevs'),
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w400,
-              fontSize: 20,
+    return Material(
+      color: Colors.transparent,
+      child: Container(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextField(
+              maxLines: null,
+              controller: TextEditingController(text: 'flamrdevs'),
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w400,
+                fontSize: 20,
+              ),
+              decoration: const InputDecoration(
+                isDense: true,
+                contentPadding: EdgeInsets.zero,
+                fillColor: Colors.transparent,
+                filled: true,
+                hoverColor: Colors.grey,
+                border: InputBorder.none,
+              ),
             ),
-            decoration: const InputDecoration(
-              isDense: true,
-              contentPadding: EdgeInsets.zero,
-              fillColor: Colors.transparent,
-              filled: true,
-              hoverColor: Colors.grey,
-              border: InputBorder.none,
+            SizedBox(
+              height: 8,
             ),
-          ),
-          SizedBox(
-            height: 8,
-          ),
-          TextField(
-            maxLines: null,
-            controller: TextEditingController(text: 'UI/UX designer'),
-            style: TextStyle(
-                color: Colors.white, fontWeight: FontWeight.w600, fontSize: 30),
-            decoration: const InputDecoration(
-              isDense: true,
-              contentPadding: EdgeInsets.zero,
-              fillColor: Colors.transparent,
-              filled: true,
-              hoverColor: Colors.grey,
-              border: InputBorder.none,
+            TextField(
+              maxLines: null,
+              controller: TextEditingController(text: 'UI/UX designer'),
+              style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 30),
+              decoration: const InputDecoration(
+                isDense: true,
+                contentPadding: EdgeInsets.zero,
+                fillColor: Colors.transparent,
+                filled: true,
+                hoverColor: Colors.grey,
+                border: InputBorder.none,
+              ),
             ),
-          ),
-          const SizedBox(
-            height: 16,
-          ),
-          TextField(
-            maxLines: null,
-            controller: TextEditingController(
-              text:
-                  'I am a UI/UX designer from Indonesia, specializing in creating user-centric and visually appealing digital experiences. With a focus on seamless and enjoyable interactions, I aim to enhance the overall user experience through strategic design solutions.',
+            const SizedBox(
+              height: 16,
             ),
-            style: TextStyle(
-                color: Colors.white, fontWeight: FontWeight.w400, fontSize: 16),
-            decoration: const InputDecoration(
-              isDense: true,
-              contentPadding: EdgeInsets.zero,
-              fillColor: Colors.transparent,
-              filled: true,
-              hoverColor: Colors.grey,
-              border: InputBorder.none,
+            TextField(
+              maxLines: null,
+              controller: TextEditingController(
+                text:
+                    'I am a UI/UX designer from Indonesia, specializing in creating user-centric and visually appealing digital experiences. With a focus on seamless and enjoyable interactions, I aim to enhance the overall user experience through strategic design solutions.',
+              ),
+              style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w400,
+                  fontSize: 16),
+              decoration: const InputDecoration(
+                isDense: true,
+                contentPadding: EdgeInsets.zero,
+                fillColor: Colors.transparent,
+                filled: true,
+                hoverColor: Colors.grey,
+                border: InputBorder.none,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
