@@ -13,6 +13,12 @@ import '../data/constants.dart';
 import '../data/storage_manager.dart';
 
 class ZkLoginProvider extends ChangeNotifier {
+  static ZkLoginProvider? _zkLoginProvider;
+  static ZkLoginProvider getInstance() {
+    _zkLoginProvider ??= ZkLoginProvider();
+    return _zkLoginProvider!;
+  }
+
   final suiClient = SuiClient(SuiUrls.devnet);
 
   SuiAccount? _account;
@@ -49,7 +55,7 @@ class ZkLoginProvider extends ChangeNotifier {
   set maxEpoch(int value) {
     _maxEpoch = value;
     ZkLoginStorageManager.setTemporaryMaxEpoch(value);
-    notifyListeners();
+    // notifyListeners();
   }
 
   String _randomness = '';
@@ -59,7 +65,7 @@ class ZkLoginProvider extends ChangeNotifier {
   set randomness(String value) {
     _randomness = value;
     ZkLoginStorageManager.setTemporaryRandomness(value);
-    notifyListeners();
+    // notifyListeners();
   }
 
   String _nonce = '';
@@ -69,7 +75,7 @@ class ZkLoginProvider extends ChangeNotifier {
   set nonce(String value) {
     _nonce = value;
     ZkLoginStorageManager.setTemporaryCacheNonce(nonce);
-    notifyListeners();
+    // notifyListeners();
   }
 
   String _salt = '';
@@ -120,6 +126,7 @@ class ZkLoginProvider extends ChangeNotifier {
   getCurrentEpoch() async {
     final result = await suiClient.getLatestSuiSystemState();
     maxEpoch = int.parse(result.epoch) + 10;
+    return maxEpoch;
   }
 
   String _jwt = '';
@@ -169,6 +176,7 @@ class ZkLoginProvider extends ChangeNotifier {
     if (address.isNotEmpty) {
       suiClient.getBalance(address).then((res) {
         balance = res.totalBalance;
+        print('myBalance: $balance');
       });
     }
   }

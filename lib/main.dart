@@ -16,13 +16,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
-        useMaterial3: true,
+    final ZkLoginProvider provider = ZkLoginProvider.getInstance();
+
+    return ChangeNotifierProvider(
+      create: (_) => provider,
+      child: MaterialApp(
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
+          useMaterial3: true,
+        ),
+        debugShowCheckedModeBanner: false,
+        home: const ZkLoginPage(),
       ),
-      debugShowCheckedModeBanner: false,
-      home: const ZkLoginPage(),
     );
   }
 }

@@ -21,7 +21,7 @@ class ZkLoginPage extends StatefulWidget {
 class _ZkLoginPageState extends State<ZkLoginPage> {
   final controller = ScrollController();
 
-  final ZkLoginProvider provider = ZkLoginProvider();
+  final ZkLoginProvider provider = ZkLoginProvider.getInstance();
 
   List<String> steps = [
     'Generate Ephemeral Key Pair',
@@ -70,16 +70,13 @@ class _ZkLoginPageState extends State<ZkLoginPage> {
           provider.jwt,
           BigInt.parse(provider.salt),
         );
-        await provider.getBalance();
+        provider.getBalance();
         print('provider.jwt: ${provider.jwt}');
         print('provider.address: ${provider.address}');
         Future.delayed(const Duration(milliseconds: 500), () {
           setState(() {
             Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(
-                    builder: (context) => HomePage(
-                          provider: provider,
-                        )),
+                MaterialPageRoute(builder: (context) => HomePage()),
                 (route) => false);
           });
         });
@@ -92,30 +89,27 @@ class _ZkLoginPageState extends State<ZkLoginPage> {
   @override
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
-    return ChangeNotifierProvider(
-      create: (_) => provider,
-      child: Consumer<ZkLoginProvider>(
-        builder: (_, v, __) {
-          return Scaffold(
-            appBar: AppBar(title: const Text('Sui zkLogin Dart Demo')),
-            body: SingleChildScrollView(
-              controller: controller,
-              child: Container(
-                margin: EdgeInsets.symmetric(
-                  vertical: width < 600 ? 20 : 40,
-                  horizontal: width < 600 ? 15 : 30,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    StepTwoPage(provider: provider),
-                  ],
-                ),
+    return Consumer<ZkLoginProvider>(
+      builder: (_, v, __) {
+        return Scaffold(
+          appBar: AppBar(title: const Text('ZkLogin Page')),
+          body: SingleChildScrollView(
+            controller: controller,
+            child: Container(
+              margin: EdgeInsets.symmetric(
+                vertical: width < 600 ? 20 : 40,
+                horizontal: width < 600 ? 15 : 30,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  StepTwoPage(provider: provider),
+                ],
               ),
             ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 }
