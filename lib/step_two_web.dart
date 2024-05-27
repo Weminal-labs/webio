@@ -52,14 +52,14 @@ class _StepTwoPageState extends State<StepTwoPage> {
           );
 
           return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 25),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: AppTheme.dividerColor,
-                width: 1,
-              ),
-            ),
+            // padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 25),
+            // decoration: BoxDecoration(
+            //   borderRadius: BorderRadius.circular(8),
+            //   border: Border.all(
+            //     color: AppTheme.dividerColor,
+            //     width: 1,
+            //   ),
+            // ),
             child: _signInWidget(context),
           );
         } else if (snapshot.hasError) {
@@ -78,6 +78,7 @@ class _StepTwoPageState extends State<StepTwoPage> {
   ) {
     return Wrap(
       alignment: WrapAlignment.start,
+      direction: Axis.vertical,
       runAlignment: WrapAlignment.center,
       runSpacing: 15,
       spacing: 15,

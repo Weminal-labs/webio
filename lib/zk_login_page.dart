@@ -1,11 +1,14 @@
 import 'dart:html' as html;
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:sui/sui.dart';
 import 'package:webio/data/constants.dart';
 import 'package:webio/home_page.dart';
 import 'package:webio/step_two_web.dart';
+import 'package:webio/widget/my_drop_down.dart';
 import 'package:zklogin/zklogin.dart';
 
 import 'data/storage_manager.dart';
@@ -49,6 +52,8 @@ class _ZkLoginPageState extends State<ZkLoginPage> {
       var maxEpoch = ZkLoginStorageManager.getTemporaryMaxEpoch();
       var nonce = ZkLoginStorageManager.getTemporaryCacheNonce();
       var randomness = ZkLoginStorageManager.getTemporaryRandomness();
+      var suinet = ZkLoginStorageManager.getTemporaryCacheClient();
+      provider.setSuiClient(suinet);
 
       if (keyPair.isNotEmpty &&
           maxEpoch > 0 &&
@@ -70,9 +75,7 @@ class _ZkLoginPageState extends State<ZkLoginPage> {
           provider.jwt,
           BigInt.parse(provider.salt),
         );
-        provider.getBalance();
-        print('provider.jwt: ${provider.jwt}');
-        print('provider.address: ${provider.address}');
+
         Future.delayed(const Duration(milliseconds: 500), () {
           setState(() {
             Navigator.of(context).pushAndRemoveUntil(
@@ -92,18 +95,60 @@ class _ZkLoginPageState extends State<ZkLoginPage> {
     return Consumer<ZkLoginProvider>(
       builder: (_, v, __) {
         return Scaffold(
-          appBar: AppBar(title: const Text('ZkLogin Page')),
-          body: SingleChildScrollView(
-            controller: controller,
-            child: Container(
-              margin: EdgeInsets.symmetric(
-                vertical: width < 600 ? 20 : 40,
-                horizontal: width < 600 ? 15 : 30,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+          backgroundColor: const Color(0xff1a191b),
+          body: Container(
+            height: MediaQuery.of(context).size.height,
+            margin: EdgeInsets.symmetric(
+              vertical: width < 600 ? 20 : 40,
+              horizontal: width < 600 ? 15 : 30,
+            ),
+            alignment: Alignment.center,
+            child: SizedBox(
+              width: width * 0.85,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  StepTwoPage(provider: provider),
+                  Expanded(
+                    child: Container(
+                      decoration: const BoxDecoration(
+                          color: Color(0xff665679),
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(16),
+                              bottomLeft: Radius.circular(16))),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            child: Image.asset(
+                              'assets/images/logo2.png',
+                            ),
+                          ),
+                          const Text(
+                            'Turn ideas into command lines',
+                            style: TextStyle(color: Colors.white, fontSize: 16),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Container(
+                      decoration: const BoxDecoration(
+                          color: Color(0xff7c7a85),
+                          borderRadius: BorderRadius.only(
+                              topRight: Radius.circular(16),
+                              bottomRight: Radius.circular(16))),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          StepTwoPage(provider: provider),
+                          MyDropDown()
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),

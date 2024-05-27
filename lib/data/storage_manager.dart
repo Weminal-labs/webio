@@ -16,6 +16,8 @@ class ZkLoginStorageManager {
 
   static const String temporaryCacheMaxEpoch = "_temporary_cache_max_epoch";
 
+  static const String temporaryCacheClient = "_temporary_cache_client";
+
   static init() async {
     _sharedPreferences = await SharedPreferences.getInstance();
   }
@@ -26,6 +28,7 @@ class ZkLoginStorageManager {
     prefs.remove(temporaryCacheNonce);
     prefs.remove(temporaryCacheRandomness);
     prefs.remove(temporaryCacheMaxEpoch);
+    prefs.remove(temporaryCacheClient);
     return null;
   }
 
@@ -56,6 +59,13 @@ class ZkLoginStorageManager {
 
   static int getTemporaryMaxEpoch() =>
       _sharedPreferences.getInt(temporaryCacheMaxEpoch) ?? 0;
+
+  static Future<bool> setTemporaryCacheClient(String value) async {
+    return await _sharedPreferences.setString(temporaryCacheClient, value);
+  }
+
+  static String getTemporaryCacheClient() =>
+      _sharedPreferences.getString(temporaryCacheClient) ?? '';
 
   static String location() {
     if (kIsWeb) return 'LocalStorage';

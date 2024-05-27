@@ -9,6 +9,7 @@ import 'package:pretty_animated_buttons/pretty_animated_buttons.dart';
 import 'package:provider/provider.dart';
 import 'package:webio/pick_upload_image.dart';
 import 'package:webio/provider/zk_login_provider.dart';
+import 'package:webio/widget/my_drop_down.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -195,9 +196,15 @@ class _HomePageState extends State<HomePage> {
         widget: Consumer<ZkLoginProvider>(
           builder:
               (BuildContext context, ZkLoginProvider value, Widget? child) {
-            return Text(
-              '${(provider.balance ?? BigInt.zero) / BigInt.from(10).pow(9)} SUI',
-              style: TextStyle(fontSize: 36, color: Colors.white),
+            print('Rebuild SUI CARD');
+            return FutureBuilder(
+              future: provider.getBalance(),
+              builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                return Text(
+                  '${(provider.balance ?? BigInt.zero) / BigInt.from(10).pow(9)} SUI',
+                  style: TextStyle(fontSize: 36, color: Colors.white),
+                );
+              },
             );
           },
         ),
@@ -428,6 +435,10 @@ class _HomePageState extends State<HomePage> {
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      const SizedBox(
+                        width: 8,
+                      ),
+                      MyDropDown(),
                       MouseRegion(
                         onHover: (event) {
                           setState(() {
@@ -616,9 +627,6 @@ class _HomePageState extends State<HomePage> {
             size: 40,
             color: Colors.white,
           ),
-        ),
-        const SizedBox(
-          width: 8,
         ),
         IconButton(
           onPressed: () async {

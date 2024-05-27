@@ -19,7 +19,21 @@ class ZkLoginProvider extends ChangeNotifier {
     return _zkLoginProvider!;
   }
 
-  final suiClient = SuiClient(SuiUrls.devnet);
+  SuiClient suiClient = SuiClient(SuiUrls.devnet);
+
+  setSuiClient(String value) {
+    print('setSuiClient: $value');
+    switch (value) {
+      case 'Devnet':
+        suiClient = SuiClient(SuiUrls.devnet);
+      case 'Testnet':
+        suiClient = SuiClient(SuiUrls.testnet);
+      case 'Mainnet':
+        suiClient = SuiClient(SuiUrls.mainnet);
+    }
+    ZkLoginStorageManager.setTemporaryCacheClient(value);
+    notifyListeners();
+  }
 
   SuiAccount? _account;
 
@@ -174,6 +188,7 @@ class ZkLoginProvider extends ChangeNotifier {
 
   getBalance() {
     if (address.isNotEmpty) {
+      print('suiClient: ${suiClient.client.url}');
       suiClient.getBalance(address).then((res) {
         balance = res.totalBalance;
         print('myBalance: $balance');
