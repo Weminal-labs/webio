@@ -188,7 +188,7 @@ class ZkLoginProvider extends ChangeNotifier {
 
   getBalance() {
     if (address.isNotEmpty) {
-      print('suiClient: ${suiClient.client.url}');
+      // print('suiClient: ${suiClient.client.url}');
       suiClient.getBalance(address).then((res) {
         balance = res.totalBalance;
         print('myBalance: $balance');

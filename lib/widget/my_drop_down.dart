@@ -16,15 +16,17 @@ class MyDropDown extends StatefulWidget {
 }
 
 class _MyDropDownState extends State<MyDropDown> {
+  late ZkLoginProvider provider;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    provider.setSuiClient('Devnet');
+    provider = ZkLoginProvider.getInstance();
+    Future.microtask(() => provider.setSuiClient('Devnet'));
   }
 
   String dropdownValue = list.first;
-  ZkLoginProvider provider = ZkLoginProvider.getInstance();
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +49,10 @@ class _MyDropDownState extends State<MyDropDown> {
             );
           }).toList(),
           onChanged: (value) {
-            provider.setSuiClient(value!);
+            setState(() {
+              dropdownValue = value!;
+              provider.setSuiClient(value);
+            });
           },
         ),
       ),

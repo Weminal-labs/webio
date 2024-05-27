@@ -75,6 +75,7 @@ class _ZkLoginPageState extends State<ZkLoginPage> {
           provider.jwt,
           BigInt.parse(provider.salt),
         );
+        print('provider.address: ${provider.address}');
 
         Future.delayed(const Duration(milliseconds: 500), () {
           setState(() {
@@ -144,7 +145,6 @@ class _ZkLoginPageState extends State<ZkLoginPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           StepTwoPage(provider: provider),
-                          MyDropDown()
                         ],
                       ),
                     ),

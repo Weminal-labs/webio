@@ -238,24 +238,13 @@ class _HomePageState extends State<HomePage> {
     return Consumer<ZkLoginProvider>(
       builder: (_, v, __) {
         return Scaffold(
-          // floatingActionButton: FloatingActionButton(
-          //   onPressed: () {
-          //     provider.requestFaucet(context);
-          //     setState(() {
-          //       list.add(
-          //         HomeEditCard(
-          //           key: 'card4',
-          //           mainAxisCellCount: 4,
-          //           crossAxisCellCount: 3,
-          //           widget: Text(
-          //             '${(provider.balance ?? BigInt.zero) / BigInt.from(10).pow(9)} SUI',
-          //             style: TextStyle(fontSize: 36, color: Colors.white),
-          //           ),
-          //         ),
-          //       );
-          //     });
-          //   },
-          // ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () async {
+              final objects =
+                  await provider.suiClient.getOwnedObjects(provider.address);
+              print('objects: ${objects.data[0].data!.objectId}');
+            },
+          ),
           backgroundColor: const Color(0xff121113),
           body: Stack(
             children: [
@@ -393,6 +382,23 @@ class _HomePageState extends State<HomePage> {
                                                       icon: const ImageIcon(
                                                         AssetImage(
                                                           'assets/images/rectangle_vertical.png',
+                                                        ),
+                                                        size: 24,
+                                                      ),
+                                                      color: Colors.white,
+                                                    ),
+                                                    IconButton(
+                                                      onPressed: () {
+                                                        setState(() {
+                                                          element.mainAxisCellCount =
+                                                              4;
+                                                          element.crossAxisCellCount =
+                                                              3;
+                                                        });
+                                                      },
+                                                      icon: const ImageIcon(
+                                                        AssetImage(
+                                                          'assets/images/nft.png',
                                                         ),
                                                         size: 24,
                                                       ),
