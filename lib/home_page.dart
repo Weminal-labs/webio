@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:pretty_animated_buttons/pretty_animated_buttons.dart';
 import 'package:provider/provider.dart';
+import 'package:webio/nft_page.dart';
 import 'package:webio/pick_upload_image.dart';
 import 'package:webio/provider/zk_login_provider.dart';
 import 'package:webio/widget/my_drop_down.dart';
@@ -387,23 +388,6 @@ class _HomePageState extends State<HomePage> {
                                                       ),
                                                       color: Colors.white,
                                                     ),
-                                                    IconButton(
-                                                      onPressed: () {
-                                                        setState(() {
-                                                          element.mainAxisCellCount =
-                                                              4;
-                                                          element.crossAxisCellCount =
-                                                              3;
-                                                        });
-                                                      },
-                                                      icon: const ImageIcon(
-                                                        AssetImage(
-                                                          'assets/images/nft.png',
-                                                        ),
-                                                        size: 24,
-                                                      ),
-                                                      color: Colors.white,
-                                                    ),
                                                   ],
                                                 ),
                                               )
@@ -651,6 +635,24 @@ class _HomePageState extends State<HomePage> {
             size: 40,
             color: Colors.white,
           ),
+        ),
+        IconButton(
+          onPressed: () async {
+            setState(() {
+              var nft = Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const NftPage(),
+                  ));
+            });
+          },
+          icon: const ImageIcon(
+            AssetImage(
+              'assets/images/nft.png',
+            ),
+            size: 24,
+          ),
+          color: Colors.white,
         ),
       ],
     );
