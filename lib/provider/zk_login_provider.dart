@@ -326,10 +326,10 @@ class ZkLoginProvider extends ChangeNotifier {
     return digest;
   }
 
-  Future<String?> executeGetComponent(BuildContext context) async {
-    String? digest;
+  Future<List<String>?> executeGetComponent(BuildContext context) async {
+    List<String>? component;
     try {
-      if (requesting) return digest;
+      if (requesting) return component;
       requesting = true;
       final txb = TransactionBlock();
       txb.setSenderIfNotSet(address);
@@ -376,7 +376,10 @@ class ZkLoginProvider extends ChangeNotifier {
         for (SuiEvent suiEvent in events) {
           print('suiEvent.parsedJson: ${suiEvent.parsedJson}');
         }
-        digest = resp.digest;
+        component = (events[0].parsedJson?['components'] as List<dynamic>)
+            .map((e) => e as String)
+            .toList();
+        // digest = resp.digest;
         print('resp.digest: ${resp.digest}');
         getBalance();
       } else {
@@ -393,7 +396,7 @@ class ZkLoginProvider extends ChangeNotifier {
     } finally {
       requesting = false;
     }
-    return digest;
+    return component;
   }
 
   Future<String?> executeMintAndTake(BuildContext context) async {
@@ -407,10 +410,11 @@ class ZkLoginProvider extends ChangeNotifier {
       txb.transferObjects([coin], txb.pureAddress(address));
 
       txb.moveCall('$packageObjectId::dbio::mint_and_take', arguments: [
-        txb.pureString('name'),
-        txb.pureString('description'),
-        txb.pureString('image_url'),
-        txb.pureString('link'),
+        txb.pureString('This is Name'),
+        txb.pureString('This is description'),
+        txb.pureString(
+            'https://wallpapers.com/images/featured/beautiful-3vau5vtfa3qn7k8v.jpg'),
+        txb.pureString(''),
         txb.pure(dbio)
       ]);
 
@@ -447,7 +451,6 @@ class ZkLoginProvider extends ChangeNotifier {
       if (resp.confirmedLocalExecution == true) {
         digest = resp.digest;
         print('resp.digest: ${resp.digest}');
-        getBalance();
       } else {
         if (context.mounted) {
           showSnackBar(context, "Transaction Send Failed");

@@ -22,7 +22,7 @@ class RouteGenerator {
             settings: routeSettings, builder: (context) => const ZkLoginPage());
       case Routes.mainPage:
         return MaterialPageRoute(
-            settings: routeSettings, builder: (context) => const HomePage());
+            settings: routeSettings, builder: (context) => const MainPage());
       case Routes.profilePage:
         return MaterialPageRoute(
             settings: routeSettings, builder: (context) => const ProfilePage());

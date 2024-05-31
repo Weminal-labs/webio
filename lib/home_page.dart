@@ -9,6 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:pretty_animated_buttons/pretty_animated_buttons.dart';
 import 'package:provider/provider.dart';
+import 'package:sui/types/objects.dart';
+import 'package:webio/model/component_model.dart';
 import 'package:webio/model/ticket_model.dart';
 import 'package:webio/nft_page.dart';
 import 'package:webio/pick_upload_image.dart';
@@ -18,23 +20,24 @@ import 'package:webio/widget/my_drop_down.dart';
 import 'data/constants.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final List<ComponentModel> componentList;
+  const HomePage({super.key, required this.componentList});
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  TextEditingController textEditingController1 =
-      TextEditingController(text: 'flamrdevs');
-  TextEditingController textEditingController2 =
-      TextEditingController(text: 'UI/UX designer');
+  final List<TextEditingController> nameControllerList = [];
+  final List<TextEditingController> desControllerList = [];
   @override
   void dispose() {
     // TODO: implement dispose
     super.dispose();
-    textEditingController1.dispose();
-    textEditingController2.dispose();
+    for (int i = 0; i < nameControllerList.length; i++) {
+      nameControllerList[i].dispose();
+      desControllerList[i].dispose();
+    }
   }
 
   final ZkLoginProvider provider = ZkLoginProvider.getInstance();
@@ -82,171 +85,286 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Widget _buildCardItem(ComponentModel componentModel, BuildContext context) {
+    return GestureDetector(
+      child: Card(
+        color: Colors.grey,
+        elevation: 5,
+        shadowColor: Colors.grey,
+        child: SizedBox(
+          child: Stack(
+            children: [
+              Align(
+                alignment: Alignment.center,
+                child: Container(
+                  height: double.maxFinite,
+                  foregroundDecoration: BoxDecoration(
+                    border: Border.all(color: Colors.transparent),
+                    borderRadius: BorderRadius.circular(15),
+                    gradient: const LinearGradient(
+                      colors: [
+                        Colors.transparent,
+                        Colors.black12,
+                        Colors.black26,
+                        Colors.black38,
+                        Colors.black45,
+                        Colors.black54,
+                        Colors.black87,
+                      ],
+                      tileMode: TileMode.mirror,
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      stops: [0.4, 0.55, 0.65, 0.75, 0.8, 0.85, 1],
+                    ),
+                  ),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.transparent),
+                    borderRadius: BorderRadius.circular(15),
+                    color: Colors.grey,
+                    // image: DecorationImage(image: randomImage, fit: BoxFit.fill),
+                  ),
+                  child: componentModel.imageUrl == null
+                      ? null
+                      : ClipRRect(
+                          borderRadius: BorderRadius.circular(15),
+                          child: FadeInImage(
+                            fit: BoxFit.cover,
+                            image: NetworkImage(componentModel.imageUrl!),
+                            placeholder:
+                                const AssetImage('assets/images/logo.png'),
+                            imageErrorBuilder: (context, error, stackTrace) {
+                              print('imageErrorBuilder: $error');
+                              return SizedBox(
+                                width: double.maxFinite,
+                                child: Image.asset(
+                                  'assets/images/logo2.png',
+                                  fit: BoxFit.cover,
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                ),
+              ),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: SizedBox(
+                  height: 150,
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ListTile(
+                              title: Text(
+                                componentModel.name ?? '',
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white),
+                              ),
+                              subtitle: Text(
+                                componentModel.description ?? '',
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    list = [
-      HomeEditCard(
-        key: 'card0',
-        mainAxisCellCount: 4,
-        crossAxisCellCount: 3,
-        widget: SizedBox(
-          height: 300,
-          width: 300,
-          child: Image.network(
-            'assets/images/logo.png',
-            fit: BoxFit.cover,
-          ),
-        ),
-      ),
-      HomeEditCard(
-          key: 'card1',
-          mainAxisCellCount: 2,
-          crossAxisCellCount: 3,
-          widget: Container(
-            width: double.maxFinite,
-            padding: const EdgeInsets.all(16),
-            child: _getTextCard(),
-          )),
-      HomeEditCard(
-          key: 'card2',
-          mainAxisCellCount: 2,
-          crossAxisCellCount: 3,
-          widget: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  style: ButtonStyle(
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(26),
-                          side: BorderSide(color: Color(0xff323035)),
-                        ),
-                      ),
-                      backgroundColor:
-                          MaterialStateProperty.all(Colors.transparent)),
-                  onPressed: () {},
-                  child: ListTile(
-                    leading: Icon(
-                      Icons.image_outlined,
-                      color: Color(0xff7c7a85),
-                      size: 24,
-                    ),
-                    title: Text(
-                      'astrolinkt',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    subtitle: Text('Astro template'),
-                  ),
+    list = widget.componentList.isNotEmpty
+        ? widget.componentList
+            .map((e) => HomeEditCard(
+                key: e.id!,
+                mainAxisCellCount: 2,
+                crossAxisCellCount: 3,
+                widget: _buildCardItem(e, context)))
+            .toList()
+        : [
+            HomeEditCard(
+              key: 'card0',
+              mainAxisCellCount: 4,
+              crossAxisCellCount: 3,
+              widget: SizedBox(
+                height: 300,
+                width: 300,
+                child: Image.network(
+                  'assets/images/logo.png',
+                  fit: BoxFit.cover,
                 ),
-                SizedBox(
-                  height: 8,
-                ),
-                ElevatedButton(
-                  style: ButtonStyle(
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(26),
-                          side: BorderSide(color: Color(0xff323035)),
-                        ),
-                      ),
-                      backgroundColor:
-                          MaterialStateProperty.all(Colors.transparent)),
-                  onPressed: () {},
-                  child: ListTile(
-                    leading: Icon(
-                      Icons.image_outlined,
-                      color: Color(0xff7c7a85),
-                      size: 24,
-                    ),
-                    title: Text(
-                      'astrolinkt',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    subtitle: Text('Astro template'),
-                  ),
-                ),
-                SizedBox(
-                  height: 8,
-                ),
-                ElevatedButton(
-                  style: ButtonStyle(
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(26),
-                          side: BorderSide(color: Color(0xff323035)),
-                        ),
-                      ),
-                      backgroundColor:
-                          MaterialStateProperty.all(Colors.transparent)),
-                  onPressed: () {},
-                  child: ListTile(
-                    leading: Icon(
-                      Icons.image_outlined,
-                      color: Color(0xff7c7a85),
-                      size: 24,
-                    ),
-                    title: Text(
-                      'astrolinkt',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    subtitle: Text('Astro template'),
-                  ),
-                ),
-                SizedBox(
-                  height: 8,
-                ),
-              ],
+              ),
             ),
-          )),
-      HomeEditCard(
-          key: 'card3',
-          mainAxisCellCount: 2,
-          crossAxisCellCount: 3,
-          widget: _getText()),
-      HomeEditCard(
-        key: 'card4',
-        mainAxisCellCount: 4,
-        crossAxisCellCount: 3,
-        widget: Consumer<ZkLoginProvider>(
-          builder:
-              (BuildContext context, ZkLoginProvider value, Widget? child) {
-            print('Rebuild SUI CARD');
-            return FutureBuilder(
-              future: provider.getBalance(),
-              builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                return Text(
-                  '${(provider.balance ?? BigInt.zero) / BigInt.from(10).pow(9)} SUI',
-                  style: TextStyle(fontSize: 36, color: Colors.white),
-                );
-              },
-            );
-          },
-        ),
-      ),
-      // HomeEditCard(
-      //   key: 'card5',
-      //   mainAxisCellCount: 2,
-      //   crossAxisCellCount: 3,
-      //   widget: Text(
-      //     'Something',
-      //     style: TextStyle(fontSize: 36, color: Colors.white),
-      //   ),
-      // ),
-      // HomeEditCard(
-      //   key: 'card6',
-      //   mainAxisCellCount: 2,
-      //   crossAxisCellCount: 3,
-      //   widget: Text(
-      //     'Something',
-      //     style: TextStyle(fontSize: 36, color: Colors.white),
-      //   ),
-      // ),
-    ];
+            HomeEditCard(
+                key: 'card1',
+                mainAxisCellCount: 2,
+                crossAxisCellCount: 3,
+                widget: Container(
+                  width: double.maxFinite,
+                  padding: const EdgeInsets.all(16),
+                  child: _getTextCard(),
+                )),
+            HomeEditCard(
+                key: 'card2',
+                mainAxisCellCount: 2,
+                crossAxisCellCount: 3,
+                widget: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
+                        style: ButtonStyle(
+                            shape: MaterialStateProperty.all<
+                                RoundedRectangleBorder>(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(26),
+                                side: BorderSide(color: Color(0xff323035)),
+                              ),
+                            ),
+                            backgroundColor:
+                                MaterialStateProperty.all(Colors.transparent)),
+                        onPressed: () {},
+                        child: ListTile(
+                          leading: Icon(
+                            Icons.image_outlined,
+                            color: Color(0xff7c7a85),
+                            size: 24,
+                          ),
+                          title: Text(
+                            'astrolinkt',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          subtitle: Text('Astro template'),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 8,
+                      ),
+                      ElevatedButton(
+                        style: ButtonStyle(
+                            shape: MaterialStateProperty.all<
+                                RoundedRectangleBorder>(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(26),
+                                side: BorderSide(color: Color(0xff323035)),
+                              ),
+                            ),
+                            backgroundColor:
+                                MaterialStateProperty.all(Colors.transparent)),
+                        onPressed: () {},
+                        child: ListTile(
+                          leading: Icon(
+                            Icons.image_outlined,
+                            color: Color(0xff7c7a85),
+                            size: 24,
+                          ),
+                          title: Text(
+                            'astrolinkt',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          subtitle: Text('Astro template'),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 8,
+                      ),
+                      ElevatedButton(
+                        style: ButtonStyle(
+                            shape: MaterialStateProperty.all<
+                                RoundedRectangleBorder>(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(26),
+                                side: BorderSide(color: Color(0xff323035)),
+                              ),
+                            ),
+                            backgroundColor:
+                                MaterialStateProperty.all(Colors.transparent)),
+                        onPressed: () {},
+                        child: ListTile(
+                          leading: Icon(
+                            Icons.image_outlined,
+                            color: Color(0xff7c7a85),
+                            size: 24,
+                          ),
+                          title: Text(
+                            'astrolinkt',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          subtitle: Text('Astro template'),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 8,
+                      ),
+                    ],
+                  ),
+                )),
+            HomeEditCard(
+                key: 'card3',
+                mainAxisCellCount: 2,
+                crossAxisCellCount: 3,
+                widget: _getText()),
+            HomeEditCard(
+              key: 'card4',
+              mainAxisCellCount: 4,
+              crossAxisCellCount: 3,
+              widget: Consumer<ZkLoginProvider>(
+                builder: (BuildContext context, ZkLoginProvider value,
+                    Widget? child) {
+                  print('Rebuild SUI CARD');
+                  return FutureBuilder(
+                    future: provider.getBalance(),
+                    builder: (BuildContext context,
+                        AsyncSnapshot<dynamic> snapshot) {
+                      return Text(
+                        '${(provider.balance ?? BigInt.zero) / BigInt.from(10).pow(9)} SUI',
+                        style: TextStyle(fontSize: 36, color: Colors.white),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+            // HomeEditCard(
+            //   key: 'card5',
+            //   mainAxisCellCount: 2,
+            //   crossAxisCellCount: 3,
+            //   widget: Text(
+            //     'Something',
+            //     style: TextStyle(fontSize: 36, color: Colors.white),
+            //   ),
+            // ),
+            // HomeEditCard(
+            //   key: 'card6',
+            //   mainAxisCellCount: 2,
+            //   crossAxisCellCount: 3,
+            //   widget: Text(
+            //     'Something',
+            //     style: TextStyle(fontSize: 36, color: Colors.white),
+            //   ),
+            // ),
+          ];
+    newComponentList = widget.componentList;
   }
+
+  late List<ComponentModel> newComponentList;
 
   @override
   Widget build(BuildContext context) {
@@ -337,7 +455,21 @@ class _HomePageState extends State<HomePage> {
                                                   IconButton(
                                                     onPressed: () {
                                                       setState(() {
+                                                        int index =
+                                                            newComponentList
+                                                                .indexWhere((e) =>
+                                                                    e.id ==
+                                                                    element
+                                                                        .key);
+                                                        newComponentList
+                                                            .removeAt(index);
                                                         list.remove(element);
+                                                        nameControllerList
+                                                            .removeAt(index);
+                                                        desControllerList
+                                                            .removeAt(index);
+                                                        print(
+                                                            'widget.componentList.length: ${widget.componentList.length}');
                                                       });
                                                     },
                                                     icon: const Icon(
@@ -456,40 +588,51 @@ class _HomePageState extends State<HomePage> {
                             shareBtnHover = false;
                           });
                         },
-                        child: Container(
-                          margin: const EdgeInsets.all(16),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: AnimateGradient(
-                              primaryBeginGeometry:
-                                  const AlignmentDirectional(0, 1),
-                              primaryEndGeometry:
-                                  const AlignmentDirectional(0, 2),
-                              secondaryBeginGeometry:
-                                  const AlignmentDirectional(2, 0),
-                              secondaryEndGeometry:
-                                  const AlignmentDirectional(0, -0.8),
-                              textDirectionForGeometry: TextDirection.rtl,
-                              primaryColors: shareBtnHover
-                                  ? [Colors.green, Colors.green, Colors.green]
-                                  : const [
-                                      Colors.green,
-                                      Colors.greenAccent,
-                                      Colors.white,
-                                    ],
-                              secondaryColors: shareBtnHover
-                                  ? [Colors.green, Colors.green, Colors.green]
-                                  : const [
-                                      Colors.white,
-                                      Colors.lightGreen,
-                                      Colors.lightGreenAccent,
-                                    ],
-                              child: const Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Text(
-                                  'Share My Profile',
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 16),
+                        child: GestureDetector(
+                          onTap: () {
+                            for (int i = 0; i < newComponentList.length; i++) {
+                              newComponentList[i].name =
+                                  nameControllerList[i].text;
+                              newComponentList[i].description =
+                                  desControllerList[i].text;
+                              print('add com: ${newComponentList[i].toJson()}');
+                            }
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.all(16),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: AnimateGradient(
+                                primaryBeginGeometry:
+                                    const AlignmentDirectional(0, 1),
+                                primaryEndGeometry:
+                                    const AlignmentDirectional(0, 2),
+                                secondaryBeginGeometry:
+                                    const AlignmentDirectional(2, 0),
+                                secondaryEndGeometry:
+                                    const AlignmentDirectional(0, -0.8),
+                                textDirectionForGeometry: TextDirection.rtl,
+                                primaryColors: shareBtnHover
+                                    ? [Colors.green, Colors.green, Colors.green]
+                                    : const [
+                                        Colors.green,
+                                        Colors.greenAccent,
+                                        Colors.white,
+                                      ],
+                                secondaryColors: shareBtnHover
+                                    ? [Colors.green, Colors.green, Colors.green]
+                                    : const [
+                                        Colors.white,
+                                        Colors.lightGreen,
+                                        Colors.lightGreenAccent,
+                                      ],
+                                child: const Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Text(
+                                    'Share My Profile',
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 16),
+                                  ),
                                 ),
                               ),
                             ),
@@ -540,6 +683,12 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _getTextCard() {
+    TextEditingController nameComtroller =
+        TextEditingController(text: 'flamrdevs');
+    TextEditingController desController =
+        TextEditingController(text: 'UI/UX designer');
+    nameControllerList.add(nameComtroller);
+    desControllerList.add(desController);
     return Material(
       color: Colors.transparent,
       child: SingleChildScrollView(
@@ -551,7 +700,7 @@ class _HomePageState extends State<HomePage> {
             children: [
               TextField(
                 maxLines: null,
-                controller: textEditingController1,
+                controller: nameComtroller,
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w400,
@@ -571,7 +720,7 @@ class _HomePageState extends State<HomePage> {
               ),
               TextField(
                 maxLines: null,
-                controller: textEditingController2,
+                controller: desController,
                 style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
@@ -676,6 +825,11 @@ class _HomePageState extends State<HomePage> {
       ],
     );
     list.add(homeEditCard);
+    newComponentList.add(ComponentModel(
+      id: homeEditCard.key,
+      name: '',
+      description: '',
+    ));
   }
 
   Widget _buildNftItem(TicketModel ticketModel, BuildContext context) {
@@ -801,4 +955,52 @@ class HomeEditCard {
       required this.mainAxisCellCount,
       required this.crossAxisCellCount,
       this.widget});
+}
+
+class MainPage extends StatelessWidget {
+  const MainPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    ZkLoginProvider provider = ZkLoginProvider.getInstance();
+
+    return FutureBuilder(
+      future: _getCardList(context),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          List<ComponentModel> cardList = snapshot.data!;
+          return HomePage(
+            componentList: cardList,
+          );
+        } else if (snapshot.hasError) {
+          return Center(
+            child: Text('${snapshot.error}'),
+          );
+        } else {
+          return CircularProgressIndicator();
+        }
+      },
+    );
+  }
+
+  Future<List<ComponentModel>> _getCardList(BuildContext context) async {
+    List<ComponentModel> componentList = [];
+    ZkLoginProvider provider = ZkLoginProvider.getInstance();
+
+    List<String>? components = await provider.executeGetComponent(context);
+    if (components != null) {
+      for (String objectId in components) {
+        SuiObjectResponse suiObjectResponse =
+            await provider.suiClient.getObject(
+          objectId,
+          options: SuiObjectDataOptions(showContent: true, showType: true),
+        );
+        SuiObject suiObject = suiObjectResponse.data!;
+        ComponentModel componentModel = ComponentModel.fromJson(
+            suiObject.content?.fields as Map<String, dynamic>);
+        componentList.add(componentModel);
+      }
+    }
+    return componentList;
+  }
 }
