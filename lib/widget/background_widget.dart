@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:animate_do/animate_do.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -28,7 +29,7 @@ class BackgroundWidgetState extends State<BackgroundWidget> {
       });
     }
     print('start await');
-    await Future.delayed(Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 500));
     print('await done');
     setState(() {
       zoomIn = true;
@@ -45,41 +46,80 @@ class BackgroundWidgetState extends State<BackgroundWidget> {
   @override
   Widget build(BuildContext context) {
     print('rebuild');
+    print('media width: ${MediaQuery.of(context).size.width}');
 
     return Material(
+      color: const Color(0xff121113),
       child: Stack(
         children: [
-          ZoomIn(
-            duration: const Duration(milliseconds: 500),
-            animate: zoomIn,
-            child: SizedBox(
-              height: double.maxFinite,
-              width: double.maxFinite,
-              child: Image(
-                image: _getImage(),
-                fit: BoxFit.cover,
+          Container(
+            foregroundDecoration: const BoxDecoration(
+              gradient: RadialGradient(
+                colors: [
+                  Colors.transparent,
+                  Colors.black12,
+                  Colors.black26,
+                  Colors.black38,
+                  Colors.black45,
+                  Colors.black54,
+                  Colors.black87,
+                  Colors.black,
+                ],
+                tileMode: TileMode.decal,
+                center: Alignment.center,
+                radius: 1.2,
+                stops: [0.75, 0.76, 0.77, 0.78, 0.79, 0.80, 0.8, 0.9],
+              ),
+            ),
+            child: ZoomIn(
+              duration: const Duration(milliseconds: 500),
+              animate: zoomIn,
+              child: Stack(
+                children: [
+                  SizedBox(
+                    height: double.maxFinite,
+                    width: double.maxFinite,
+                    child: Image(
+                      image: _getImage(),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
-          Container(
-            // decoration: BoxDecoration(
-            //     color: Colors.blue,
-            //     image: DecorationImage(image: _getImage(), fit: BoxFit.cover)),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
+          SizedBox(
+            height: double.maxFinite,
+            width: double.maxFinite,
+            child: Image.asset(
+              'assets/images/bg_circle.png',
+              fit: BoxFit.cover,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                FadeInUp(
+                  delay: Duration(milliseconds: 100),
+                  duration: const Duration(milliseconds: 500),
+                  animate: zoomIn,
+                  child: Text(
                     name ?? '',
                     style: GoogleFonts.alegreya(
-                        textStyle: TextStyle(
+                        textStyle: const TextStyle(
                             color: Colors.white,
                             fontSize: 48,
                             fontWeight: FontWeight.w600)),
                   ),
-                  Text(
+                ),
+                FadeInUp(
+                  delay: Duration(milliseconds: 200),
+                  duration: const Duration(milliseconds: 500),
+                  animate: zoomIn,
+                  child: Text(
                     des ?? '',
                     style: GoogleFonts.arimo(
                         textStyle: TextStyle(
@@ -87,8 +127,8 @@ class BackgroundWidgetState extends State<BackgroundWidget> {
                             fontSize: 16,
                             fontWeight: FontWeight.w400)),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ],

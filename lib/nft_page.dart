@@ -109,7 +109,7 @@ class _NftPageState extends State<NftPage> {
                                   ticketModels.add(ticketModel);
                                 }
 
-                                return _buildTopicItem(
+                                return _buildNftItem(
                                     ticketModel, networkImage, context);
                               } else if (snapshot.hasError) {
                                 return Center(
@@ -139,11 +139,11 @@ class _NftPageState extends State<NftPage> {
     );
   }
 
-  Widget _buildTopicItem(TicketModel ticketModel, NetworkImage networkImage,
+  Widget _buildNftItem(TicketModel ticketModel, NetworkImage networkImage,
       BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // Navigator.pushNamed(context, Routes.topicPage, arguments: topicModel.id);
+        Navigator.pop(context, ticketModel);
       },
       child: Card(
         color: Colors.grey,
@@ -217,10 +217,6 @@ class _NftPageState extends State<NftPage> {
                                 style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white),
-                              ),
-                              subtitle: Text(
-                                ticketModel.description ?? '',
-                                style: TextStyle(color: Colors.white),
                               ),
                             ),
                           ],

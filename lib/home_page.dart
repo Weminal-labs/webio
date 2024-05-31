@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:pretty_animated_buttons/pretty_animated_buttons.dart';
 import 'package:provider/provider.dart';
+import 'package:webio/model/ticket_model.dart';
 import 'package:webio/nft_page.dart';
 import 'package:webio/pick_upload_image.dart';
 import 'package:webio/provider/zk_login_provider.dart';
@@ -239,13 +240,6 @@ class _HomePageState extends State<HomePage> {
     return Consumer<ZkLoginProvider>(
       builder: (_, v, __) {
         return Scaffold(
-          floatingActionButton: FloatingActionButton(
-            onPressed: () async {
-              final objects =
-                  await provider.suiClient.getOwnedObjects(provider.address);
-              print('objects: ${objects.data[0].data!.objectId}');
-            },
-          ),
           backgroundColor: const Color(0xff121113),
           body: Stack(
             children: [
@@ -304,8 +298,8 @@ class _HomePageState extends State<HomePage> {
                                                     : const Color(0xff323035))),
                                         alignment: Alignment.center,
                                         child: Container(
-                                            child: SingleChildScrollView(
-                                                child: element.widget)),
+                                            padding: EdgeInsets.all(8),
+                                            child: element.widget),
                                       ),
                                       if (element.isHover)
                                         Padding(
@@ -526,71 +520,73 @@ class _HomePageState extends State<HomePage> {
   Widget _getTextCard() {
     return Material(
       color: Colors.transparent,
-      child: Container(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            TextField(
-              maxLines: null,
-              controller: TextEditingController(text: 'flamrdevs'),
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w400,
-                fontSize: 20,
-              ),
-              decoration: const InputDecoration(
-                isDense: true,
-                contentPadding: EdgeInsets.zero,
-                fillColor: Colors.transparent,
-                filled: true,
-                hoverColor: Colors.grey,
-                border: InputBorder.none,
-              ),
-            ),
-            SizedBox(
-              height: 8,
-            ),
-            TextField(
-              maxLines: null,
-              controller: TextEditingController(text: 'UI/UX designer'),
-              style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 30),
-              decoration: const InputDecoration(
-                isDense: true,
-                contentPadding: EdgeInsets.zero,
-                fillColor: Colors.transparent,
-                filled: true,
-                hoverColor: Colors.grey,
-                border: InputBorder.none,
-              ),
-            ),
-            const SizedBox(
-              height: 16,
-            ),
-            TextField(
-              maxLines: null,
-              controller: TextEditingController(
-                text:
-                    'I am a UI/UX designer from Indonesia, specializing in creating user-centric and visually appealing digital experiences. With a focus on seamless and enjoyable interactions, I aim to enhance the overall user experience through strategic design solutions.',
-              ),
-              style: TextStyle(
+      child: SingleChildScrollView(
+        child: Container(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextField(
+                maxLines: null,
+                controller: TextEditingController(text: 'flamrdevs'),
+                style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w400,
-                  fontSize: 16),
-              decoration: const InputDecoration(
-                isDense: true,
-                contentPadding: EdgeInsets.zero,
-                fillColor: Colors.transparent,
-                filled: true,
-                hoverColor: Colors.grey,
-                border: InputBorder.none,
+                  fontSize: 20,
+                ),
+                decoration: const InputDecoration(
+                  isDense: true,
+                  contentPadding: EdgeInsets.zero,
+                  fillColor: Colors.transparent,
+                  filled: true,
+                  hoverColor: Colors.grey,
+                  border: InputBorder.none,
+                ),
               ),
-            ),
-          ],
+              SizedBox(
+                height: 8,
+              ),
+              TextField(
+                maxLines: null,
+                controller: TextEditingController(text: 'UI/UX designer'),
+                style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 30),
+                decoration: const InputDecoration(
+                  isDense: true,
+                  contentPadding: EdgeInsets.zero,
+                  fillColor: Colors.transparent,
+                  filled: true,
+                  hoverColor: Colors.grey,
+                  border: InputBorder.none,
+                ),
+              ),
+              const SizedBox(
+                height: 16,
+              ),
+              TextField(
+                maxLines: null,
+                controller: TextEditingController(
+                  text:
+                      'I am a UI/UX designer from Indonesia, specializing in creating user-centric and visually appealing digital experiences. With a focus on seamless and enjoyable interactions, I aim to enhance the overall user experience through strategic design solutions.',
+                ),
+                style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w400,
+                    fontSize: 16),
+                decoration: const InputDecoration(
+                  isDense: true,
+                  contentPadding: EdgeInsets.zero,
+                  fillColor: Colors.transparent,
+                  filled: true,
+                  hoverColor: Colors.grey,
+                  border: InputBorder.none,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -638,12 +634,13 @@ class _HomePageState extends State<HomePage> {
         ),
         IconButton(
           onPressed: () async {
+            TicketModel ticketModel = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const NftPage(),
+                ));
             setState(() {
-              var nft = Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const NftPage(),
-                  ));
+              homeEditCard.widget = _buildNftItem(ticketModel, context);
             });
           },
           icon: const ImageIcon(
@@ -657,6 +654,105 @@ class _HomePageState extends State<HomePage> {
       ],
     );
     list.add(homeEditCard);
+  }
+
+  Widget _buildNftItem(TicketModel ticketModel, BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        // Navigator.pop(context, ticketModel);
+      },
+      child: Card(
+        color: Colors.grey,
+        elevation: 5,
+        shadowColor: Colors.grey,
+        child: SizedBox(
+          child: Stack(
+            children: [
+              Align(
+                alignment: Alignment.center,
+                child: Container(
+                  height: double.maxFinite,
+                  foregroundDecoration: BoxDecoration(
+                    border: Border.all(color: Colors.transparent),
+                    borderRadius: BorderRadius.circular(15),
+                    gradient: const LinearGradient(
+                      colors: [
+                        Colors.transparent,
+                        Colors.black12,
+                        Colors.black26,
+                        Colors.black38,
+                        Colors.black45,
+                        Colors.black54,
+                        Colors.black87,
+                      ],
+                      tileMode: TileMode.mirror,
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      stops: [0.4, 0.55, 0.65, 0.75, 0.8, 0.85, 1],
+                    ),
+                  ),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.transparent),
+                    borderRadius: BorderRadius.circular(15),
+                    color: Colors.grey,
+                    // image: DecorationImage(image: randomImage, fit: BoxFit.fill),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(15),
+                    child: FadeInImage(
+                      fit: BoxFit.cover,
+                      image: NetworkImage(ticketModel.url ?? ''),
+                      placeholder: const AssetImage('assets/images/logo.png'),
+                      imageErrorBuilder: (context, error, stackTrace) {
+                        return SizedBox(
+                          width: double.maxFinite,
+                          child: Image.asset(
+                            'assets/images/logo.png',
+                            fit: BoxFit.cover,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: SizedBox(
+                  height: 150,
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ListTile(
+                              title: Text(
+                                ticketModel.name ?? '',
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white),
+                              ),
+                              subtitle: Text(
+                                ticketModel.description ?? '',
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.white),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   int _getResize() {

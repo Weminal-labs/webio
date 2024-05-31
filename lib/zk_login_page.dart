@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:html' as html;
+import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -7,12 +9,14 @@ import 'package:provider/provider.dart';
 import 'package:sui/sui.dart';
 import 'package:webio/data/constants.dart';
 import 'package:webio/home_page.dart';
+import 'package:webio/service/api_service.dart';
 import 'package:webio/step_two_web.dart';
 import 'package:webio/widget/my_drop_down.dart';
 import 'package:zklogin/zklogin.dart';
 
 import 'data/storage_manager.dart';
 import 'provider/zk_login_provider.dart';
+import 'package:sui/sui.dart';
 
 class ZkLoginPage extends StatefulWidget {
   const ZkLoginPage({super.key});
@@ -71,12 +75,28 @@ class _ZkLoginPageState extends State<ZkLoginPage> {
         // create user salt
         provider.salt = '178325214277756936057804824740577021427';
         // get user address
-        provider.address = jwtToAddress(
-          provider.jwt,
-          BigInt.parse(provider.salt),
-        );
+        // provider.address = jwtToAddress(
+        //   provider.jwt,
+        //   BigInt.parse(provider.salt),
+        // );
+        final (salt, address) = await ApiService.getSaltAndAddress();
+        provider.address = address;
+        provider.salt = salt;
+        print('provider.jwt: ${provider.jwt}');
         print('provider.address: ${provider.address}');
-
+        print('provider.randomness: ${provider.randomness}');
+        print('provider.maxEpoch: ${provider.maxEpoch}');
+        provider.extendedEphemeralPublicKey = getExtendedEphemeralPublicKey(
+          provider.account!.keyPair.getPublicKey(),
+        );
+        print('nonce: ${provider.nonce}');
+        print(
+            'public key: ${provider.account!.keyPair.getPublicKey().toBase64()}');
+        print('publickey type: ${provider.account!.keyPair.runtimeType}');
+        print(
+            "provider.extendedEphemeralPublicKey: ${provider.account!.keyPair.getPublicKey().toSuiPublicKey()}");
+        await ApiService.getProof();
+        print('my proof: ${provider.zkProof}');
         Future.delayed(const Duration(milliseconds: 500), () {
           setState(() {
             Navigator.of(context).pushAndRemoveUntil(
