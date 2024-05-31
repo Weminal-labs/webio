@@ -92,8 +92,8 @@ class _NftPageState extends State<NftPage> {
                                   ticketModel.url = 'assets/images/sui.png';
                                   ticketModel.name = 'SUI coins';
                                 }
-                                NetworkImage networkImage =
-                                    NetworkImage(ticketModel.url!);
+                                NetworkImage networkImage = NetworkImage(
+                                    ticketModel.url ?? 'assets/images/sui.png');
 
                                 if (networkImages.isEmpty) {
                                   WidgetsBinding.instance

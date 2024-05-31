@@ -16,6 +16,13 @@ class RouteGenerator {
       return MaterialPageRoute(
           settings: routeSettings, builder: (context) => const ZkLoginPage());
     }
+    if (routeSettings.name != null && routeSettings.name!.contains('profile')) {
+      return MaterialPageRoute(
+          settings: routeSettings,
+          builder: (context) => ProfilePage(
+                address: routeSettings.name!.split('profile/')[1],
+              ));
+    }
     switch (routeSettings.name) {
       case Routes.loginPage:
         return MaterialPageRoute(
@@ -23,9 +30,9 @@ class RouteGenerator {
       case Routes.mainPage:
         return MaterialPageRoute(
             settings: routeSettings, builder: (context) => const MainPage());
-      case Routes.profilePage:
-        return MaterialPageRoute(
-            settings: routeSettings, builder: (context) => const ProfilePage());
+      // case Routes.profilePage:
+      //   return MaterialPageRoute(
+      //       settings: routeSettings, builder: (context) => const ProfilePage(address: ,));
       default:
         print('routeSettings.name: ${routeSettings.name}');
         return unDefinedRoute();

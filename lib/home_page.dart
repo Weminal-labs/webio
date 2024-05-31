@@ -189,179 +189,25 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    list = widget.componentList.isNotEmpty
-        ? widget.componentList
+    if (widget.componentList.isNotEmpty) {
+      for (ComponentModel componentModel in widget.componentList) {
+        nameControllerList
+            .add(TextEditingController(text: componentModel.name));
+        desControllerList
+            .add(TextEditingController(text: componentModel.description));
+      }
+    }
+    list =
+        // widget.componentList.isNotEmpty
+        //     ?
+        widget.componentList
             .map((e) => HomeEditCard(
                 key: e.id!,
                 mainAxisCellCount: 2,
                 crossAxisCellCount: 3,
                 widget: _buildCardItem(e, context)))
-            .toList()
-        : [
-            HomeEditCard(
-              key: 'card0',
-              mainAxisCellCount: 4,
-              crossAxisCellCount: 3,
-              widget: SizedBox(
-                height: 300,
-                width: 300,
-                child: Image.network(
-                  'assets/images/logo.png',
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-            HomeEditCard(
-                key: 'card1',
-                mainAxisCellCount: 2,
-                crossAxisCellCount: 3,
-                widget: Container(
-                  width: double.maxFinite,
-                  padding: const EdgeInsets.all(16),
-                  child: _getTextCard(),
-                )),
-            HomeEditCard(
-                key: 'card2',
-                mainAxisCellCount: 2,
-                crossAxisCellCount: 3,
-                widget: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ElevatedButton(
-                        style: ButtonStyle(
-                            shape: MaterialStateProperty.all<
-                                RoundedRectangleBorder>(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(26),
-                                side: BorderSide(color: Color(0xff323035)),
-                              ),
-                            ),
-                            backgroundColor:
-                                MaterialStateProperty.all(Colors.transparent)),
-                        onPressed: () {},
-                        child: ListTile(
-                          leading: Icon(
-                            Icons.image_outlined,
-                            color: Color(0xff7c7a85),
-                            size: 24,
-                          ),
-                          title: Text(
-                            'astrolinkt',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          subtitle: Text('Astro template'),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 8,
-                      ),
-                      ElevatedButton(
-                        style: ButtonStyle(
-                            shape: MaterialStateProperty.all<
-                                RoundedRectangleBorder>(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(26),
-                                side: BorderSide(color: Color(0xff323035)),
-                              ),
-                            ),
-                            backgroundColor:
-                                MaterialStateProperty.all(Colors.transparent)),
-                        onPressed: () {},
-                        child: ListTile(
-                          leading: Icon(
-                            Icons.image_outlined,
-                            color: Color(0xff7c7a85),
-                            size: 24,
-                          ),
-                          title: Text(
-                            'astrolinkt',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          subtitle: Text('Astro template'),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 8,
-                      ),
-                      ElevatedButton(
-                        style: ButtonStyle(
-                            shape: MaterialStateProperty.all<
-                                RoundedRectangleBorder>(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(26),
-                                side: BorderSide(color: Color(0xff323035)),
-                              ),
-                            ),
-                            backgroundColor:
-                                MaterialStateProperty.all(Colors.transparent)),
-                        onPressed: () {},
-                        child: ListTile(
-                          leading: Icon(
-                            Icons.image_outlined,
-                            color: Color(0xff7c7a85),
-                            size: 24,
-                          ),
-                          title: Text(
-                            'astrolinkt',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          subtitle: Text('Astro template'),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 8,
-                      ),
-                    ],
-                  ),
-                )),
-            HomeEditCard(
-                key: 'card3',
-                mainAxisCellCount: 2,
-                crossAxisCellCount: 3,
-                widget: _getText()),
-            HomeEditCard(
-              key: 'card4',
-              mainAxisCellCount: 4,
-              crossAxisCellCount: 3,
-              widget: Consumer<ZkLoginProvider>(
-                builder: (BuildContext context, ZkLoginProvider value,
-                    Widget? child) {
-                  print('Rebuild SUI CARD');
-                  return FutureBuilder(
-                    future: provider.getBalance(),
-                    builder: (BuildContext context,
-                        AsyncSnapshot<dynamic> snapshot) {
-                      return Text(
-                        '${(provider.balance ?? BigInt.zero) / BigInt.from(10).pow(9)} SUI',
-                        style: TextStyle(fontSize: 36, color: Colors.white),
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
-            // HomeEditCard(
-            //   key: 'card5',
-            //   mainAxisCellCount: 2,
-            //   crossAxisCellCount: 3,
-            //   widget: Text(
-            //     'Something',
-            //     style: TextStyle(fontSize: 36, color: Colors.white),
-            //   ),
-            // ),
-            // HomeEditCard(
-            //   key: 'card6',
-            //   mainAxisCellCount: 2,
-            //   crossAxisCellCount: 3,
-            //   widget: Text(
-            //     'Something',
-            //     style: TextStyle(fontSize: 36, color: Colors.white),
-            //   ),
-            // ),
-          ];
-    newComponentList = widget.componentList;
+            .toList();
+    newComponentList = List.from(widget.componentList);
   }
 
   late List<ComponentModel> newComponentList;
@@ -375,12 +221,6 @@ class _HomePageState extends State<HomePage> {
       builder: (_, v, __) {
         return Scaffold(
           backgroundColor: const Color(0xff121113),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () async {
-              var result = await provider.executeMintAndTake(context);
-              print('myResult = $result');
-            },
-          ),
           body: Stack(
             children: [
               DragAnimNotification(
@@ -589,14 +429,24 @@ class _HomePageState extends State<HomePage> {
                           });
                         },
                         child: GestureDetector(
-                          onTap: () {
+                          onTap: () async {
                             for (int i = 0; i < newComponentList.length; i++) {
                               newComponentList[i].name =
                                   nameControllerList[i].text;
                               newComponentList[i].description =
                                   desControllerList[i].text;
                               print('add com: ${newComponentList[i].toJson()}');
+                              await provider.executeMintAndTake(
+                                  context, newComponentList[i]);
                             }
+                            print(
+                                'widget.componentList.length: ${widget.componentList.length}');
+                            for (ComponentModel e in widget.componentList) {
+                              await provider.executeRemove(context, e.id!);
+                              print('remove ${e.id}');
+                            }
+                            html.window.location.href =
+                                '${Constant.website}/#/profile/${provider.address}';
                           },
                           child: Container(
                             margin: const EdgeInsets.all(16),
@@ -977,7 +827,7 @@ class MainPage extends StatelessWidget {
             child: Text('${snapshot.error}'),
           );
         } else {
-          return CircularProgressIndicator();
+          return Center(child: CircularProgressIndicator());
         }
       },
     );
@@ -998,7 +848,12 @@ class MainPage extends StatelessWidget {
         SuiObject suiObject = suiObjectResponse.data!;
         ComponentModel componentModel = ComponentModel.fromJson(
             suiObject.content?.fields as Map<String, dynamic>);
-        componentList.add(componentModel);
+        print('componentModel: ${componentModel.toJson()}');
+        if (componentModel.isActive == true) {
+          print('componentModel True: ${componentModel.toJson()}');
+
+          componentList.add(componentModel);
+        }
       }
     }
     return componentList;

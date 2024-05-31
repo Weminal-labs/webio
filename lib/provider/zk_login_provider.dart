@@ -10,6 +10,7 @@ import 'package:sui/models/sui_event.dart';
 import 'package:sui/sui.dart';
 import 'package:sui/types/common.dart';
 import 'package:sui/types/faucet.dart';
+import 'package:webio/model/component_model.dart';
 import 'package:zklogin/zklogin.dart';
 
 import '../data/constants.dart';
@@ -381,7 +382,6 @@ class ZkLoginProvider extends ChangeNotifier {
             .toList();
         // digest = resp.digest;
         print('resp.digest: ${resp.digest}');
-        getBalance();
       } else {
         if (context.mounted) {
           showSnackBar(context, "Transaction Send Failed");
@@ -399,7 +399,8 @@ class ZkLoginProvider extends ChangeNotifier {
     return component;
   }
 
-  Future<String?> executeMintAndTake(BuildContext context) async {
+  Future<String?> executeMintAndTake(
+      BuildContext context, ComponentModel componentModel) async {
     String? digest;
     try {
       if (requesting) return digest;
@@ -410,11 +411,10 @@ class ZkLoginProvider extends ChangeNotifier {
       txb.transferObjects([coin], txb.pureAddress(address));
 
       txb.moveCall('$packageObjectId::dbio::mint_and_take', arguments: [
-        txb.pureString('This is Name'),
-        txb.pureString('This is description'),
-        txb.pureString(
-            'https://wallpapers.com/images/featured/beautiful-3vau5vtfa3qn7k8v.jpg'),
-        txb.pureString(''),
+        txb.pureString(componentModel.name ?? ''),
+        txb.pureString(componentModel.description ?? ''),
+        txb.pureString(componentModel.imageUrl ?? ''),
+        txb.pureString(componentModel.link ?? ''),
         txb.pure(dbio)
       ]);
 
@@ -468,28 +468,56 @@ class ZkLoginProvider extends ChangeNotifier {
     return digest;
   }
 
-  Future<String?> executeGetUserComponents(
-      BuildContext context, String address) async {
+  Future<String?> executeRemove(BuildContext context, String id) async {
     String? digest;
-    SuiAccount suiAccount = SuiAccount.fromMnemonics(
-        "used gentle rose curve alone force mistake vault butter solution carbon blossom",
-        SignatureScheme.Ed25519);
-    SuiAddress suiAddress = suiAccount.getAddress();
     try {
       if (requesting) return digest;
       requesting = true;
       final txb = TransactionBlock();
-      txb.setSenderIfNotSet(suiAddress);
+      txb.setSenderIfNotSet(address);
       final coin = txb.splitCoins(txb.gas, [txb.pureInt(22222)]);
-      txb.transferObjects([coin], txb.pureAddress(suiAddress));
+      txb.transferObjects([coin], txb.pureAddress(address));
 
-      txb.moveCall('$packageObjectId::dbio::get_user_components',
-          arguments: [txb.pureAddress(suiAddress), txb.pure(dbio)]);
+      txb.moveCall('$packageObjectId::dbio::remove', arguments: [txb.pure(id)]);
 
-      final result =
-          await suiClient.signAndExecuteTransactionBlock(suiAccount, txb);
-      digest = result.digest;
-      print('result.digest: ${result.digest}');
+      final sign = await txb.sign(
+        SignOptions(
+          signer: account!.keyPair,
+          client: suiClient,
+        ),
+      );
+      final jwtJson = decodeJwt(jwt);
+      final addressSeed = genAddressSeed(
+        BigInt.parse(salt),
+        'sub',
+        jwtJson['sub'].toString(),
+        jwtJson['aud'].toString(),
+      );
+      zkProof["addressSeed"] = addressSeed.toString();
+      print('sign.signature: ${sign.signature}');
+      print('maxEpoch: ${maxEpoch}');
+      print('new epoch: ${await getCurrentEpoch()}');
+      final zkSign = getZkLoginSignature(
+        ZkLoginSignature(
+          inputs: ZkLoginSignatureInputs.fromJson(zkProof),
+          maxEpoch: maxEpoch,
+          userSignature: base64Decode(sign.signature),
+        ),
+      );
+      final resp = await suiClient.executeTransactionBlock(
+        sign.bytes,
+        [zkSign],
+        options: SuiTransactionBlockResponseOptions(showEffects: true),
+        requestType: ExecuteTransaction.WaitForLocalExecution,
+      );
+      if (resp.confirmedLocalExecution == true) {
+        digest = resp.digest;
+        print('remove resp.digest: ${resp.digest}');
+      } else {
+        if (context.mounted) {
+          showSnackBar(context, "Transaction Send Failed");
+        }
+      }
     } catch (e) {
       if (context.mounted) {
         print('error: ${e.toString()}');
@@ -500,5 +528,85 @@ class ZkLoginProvider extends ChangeNotifier {
       requesting = false;
     }
     return digest;
+  }
+
+  Future<List<String>?> executeGetUserComponents(
+      BuildContext context, String address) async {
+    List<String>? component;
+
+    String? digest;
+    SuiAccount suiAccount = SuiAccount.fromMnemonics(
+        "used gentle rose curve alone force mistake vault butter solution carbon blossom",
+        SignatureScheme.Ed25519);
+    SuiAddress suiAddress = suiAccount.getAddress();
+    try {
+      if (requesting) return component;
+      requesting = true;
+      final txb = TransactionBlock();
+      txb.setSenderIfNotSet(suiAddress);
+      final coin = txb.splitCoins(txb.gas, [txb.pureInt(22222)]);
+      txb.transferObjects([coin], txb.pureAddress(suiAddress));
+
+      txb.moveCall('$packageObjectId::dbio::get_user_components',
+          arguments: [txb.pureAddress(address), txb.pure(dbio)]);
+
+      final result = await suiClient.signAndExecuteTransactionBlock(
+          suiAccount, txb,
+          responseOptions:
+              SuiTransactionBlockResponseOptions(showEvents: true));
+      digest = result.digest;
+      List<SuiEvent> events = result.events;
+      print('event length: ${events.length}');
+      component = (events[0].parsedJson?['components'] as List<dynamic>)
+          .map((e) => e as String)
+          .toList();
+
+      print('result.digest: ${result.digest}');
+    } catch (e) {
+      if (context.mounted) {
+        print('error: ${e.toString()}');
+        showSnackBar(context, "${e.toString()}", seconds: 6);
+        rethrow;
+      }
+    } finally {
+      requesting = false;
+    }
+    return component;
+  }
+
+  Future<List<String>?> xxx(BuildContext context) async {
+    List<String>? component;
+
+    String? digest;
+    SuiAccount suiAccount = SuiAccount.fromMnemonics(
+        "used gentle rose curve alone force mistake vault butter solution carbon blossom",
+        SignatureScheme.Ed25519);
+    SuiAddress suiAddress = suiAccount.getAddress();
+    try {
+      if (requesting) return component;
+      requesting = true;
+      final txb = TransactionBlock();
+      txb.setSenderIfNotSet(suiAddress);
+      final coin = txb.splitCoins(txb.gas, [txb.pureInt(22222)]);
+      txb.transferObjects([coin], txb.pureAddress(suiAddress));
+
+      txb.moveCall('$packageObjectId::dbio::get_components',
+          arguments: [txb.pure(dbio)]);
+
+      final result =
+          await suiClient.signAndExecuteTransactionBlock(suiAccount, txb);
+      digest = result.digest;
+
+      print('result.digest: ${result.digest}');
+    } catch (e) {
+      if (context.mounted) {
+        print('error: ${e.toString()}');
+        showSnackBar(context, "${e.toString()}", seconds: 6);
+        rethrow;
+      }
+    } finally {
+      requesting = false;
+    }
+    return component;
   }
 }
