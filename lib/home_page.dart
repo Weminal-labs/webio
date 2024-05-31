@@ -2,6 +2,8 @@ import 'package:animate_gradient/animate_gradient.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:drag_anim/drag_anim.dart';
 import 'package:drag_anim/drag_anim_notification.dart';
+import 'dart:html' as html;
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -13,6 +15,8 @@ import 'package:webio/pick_upload_image.dart';
 import 'package:webio/provider/zk_login_provider.dart';
 import 'package:webio/widget/my_drop_down.dart';
 
+import 'data/constants.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -21,6 +25,18 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  TextEditingController textEditingController1 =
+      TextEditingController(text: 'flamrdevs');
+  TextEditingController textEditingController2 =
+      TextEditingController(text: 'UI/UX designer');
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    textEditingController1.dispose();
+    textEditingController2.dispose();
+  }
+
   final ZkLoginProvider provider = ZkLoginProvider.getInstance();
 
   Color color = const Color(0xff1a191b);
@@ -241,6 +257,12 @@ class _HomePageState extends State<HomePage> {
       builder: (_, v, __) {
         return Scaffold(
           backgroundColor: const Color(0xff121113),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () async {
+              var result = await provider.executeMintAndTake(context);
+              print('myResult = $result');
+            },
+          ),
           body: Stack(
             children: [
               DragAnimNotification(
@@ -529,7 +551,7 @@ class _HomePageState extends State<HomePage> {
             children: [
               TextField(
                 maxLines: null,
-                controller: TextEditingController(text: 'flamrdevs'),
+                controller: textEditingController1,
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w400,
@@ -549,7 +571,7 @@ class _HomePageState extends State<HomePage> {
               ),
               TextField(
                 maxLines: null,
-                controller: TextEditingController(text: 'UI/UX designer'),
+                controller: textEditingController2,
                 style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,

@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:sui/sui.dart';
 import 'package:webio/data/constants.dart';
 import 'package:webio/home_page.dart';
+import 'package:webio/router/router_manager.dart';
 import 'package:webio/service/api_service.dart';
 import 'package:webio/step_two_web.dart';
 import 'package:webio/widget/my_drop_down.dart';
@@ -49,6 +50,8 @@ class _ZkLoginPageState extends State<ZkLoginPage> {
 
   _recoverCacheData() async {
     final url = html.window.location.href;
+    print('myUrl: $url');
+    print(url.startsWith(Constant.replaceUrl));
     if (url.startsWith(Constant.replaceUrl)) {
       print('_recoverCacheData');
 
@@ -75,13 +78,13 @@ class _ZkLoginPageState extends State<ZkLoginPage> {
         // create user salt
         provider.salt = '178325214277756936057804824740577021427';
         // get user address
-        // provider.address = jwtToAddress(
-        //   provider.jwt,
-        //   BigInt.parse(provider.salt),
-        // );
-        final (salt, address) = await ApiService.getSaltAndAddress();
-        provider.address = address;
-        provider.salt = salt;
+        provider.address = jwtToAddress(
+          provider.jwt,
+          BigInt.parse(provider.salt),
+        );
+        // final (salt, address) = await ApiService.getSaltAndAddress();
+        // provider.address = address;
+        // provider.salt = salt;
         print('provider.jwt: ${provider.jwt}');
         print('provider.address: ${provider.address}');
         print('provider.randomness: ${provider.randomness}');
@@ -95,13 +98,15 @@ class _ZkLoginPageState extends State<ZkLoginPage> {
         print('publickey type: ${provider.account!.keyPair.runtimeType}');
         print(
             "provider.extendedEphemeralPublicKey: ${provider.account!.keyPair.getPublicKey().toSuiPublicKey()}");
-        await ApiService.getProof();
+        // Map<String, dynamic> proof = await ApiService.getProof();
+        // provider.zkProof = proof;
+        await provider.getZkProof(context);
+
         print('my proof: ${provider.zkProof}');
         Future.delayed(const Duration(milliseconds: 500), () {
           setState(() {
-            Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => HomePage()),
-                (route) => false);
+            Navigator.of(context)
+                .pushNamedAndRemoveUntil(Routes.mainPage, (route) => false);
           });
         });
       }

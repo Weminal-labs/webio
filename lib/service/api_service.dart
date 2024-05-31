@@ -29,7 +29,7 @@ class ApiService {
     return (data['salt'] as String, data['address'] as String);
   }
 
-  static Future<void> getProof() async {
+  static Future<Map<String, dynamic>> getProof() async {
     var newHeader = headers;
     newHeader.addAll({"zklogin-jwt": "${ZkLoginProvider.getInstance().jwt}"});
     ZkLoginProvider provider = ZkLoginProvider.getInstance();
@@ -43,7 +43,9 @@ class ApiService {
               "${provider.account!.keyPair.getPublicKey().toSuiPublicKey()}"
         }));
     if (res.statusCode == 200) {
-      ZkLoginProvider.getInstance().zkProof = jsonDecode(res.body);
+      Map<String, dynamic> decoded =
+          jsonDecode(res.body) as Map<String, dynamic>;
+      return decoded['data'];
     } else {
       print("getProof fail: ${res.body}");
       throw Exception("getProof fail ${res.statusCode}");

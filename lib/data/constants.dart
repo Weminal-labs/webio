@@ -1,3 +1,5 @@
+import '../router/router_manager.dart';
+
 class Constant {
   static String redirectUrl = 'http://localhost:3000';
   static String website = 'http://localhost:3000';

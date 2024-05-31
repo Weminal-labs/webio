@@ -1,11 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:js_interop';
 
 import 'package:another_flushbar/flushbar.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:sui/models/sui_event.dart';
 import 'package:sui/sui.dart';
+import 'package:sui/types/common.dart';
 import 'package:sui/types/faucet.dart';
 import 'package:zklogin/zklogin.dart';
 
@@ -18,6 +21,11 @@ class ZkLoginProvider extends ChangeNotifier {
     _zkLoginProvider ??= ZkLoginProvider();
     return _zkLoginProvider!;
   }
+
+  static const String packageObjectId =
+      '0x188f13bcb4f5b32c5a975e509067847aa7e9b2b14f49bb1c539d70c6104de88c';
+  static const String dbio =
+      '0x5ed49b3b0e1ef306ada1f016f73c6414cf0451c2ccf3d3bced4d17095330c60c';
 
   SuiClient suiClient = SuiClient(SuiUrls.devnet);
 
@@ -134,7 +142,7 @@ class ZkLoginProvider extends ChangeNotifier {
 
   set requesting(bool value) {
     _requesting = value;
-    notifyListeners();
+    // notifyListeners();
   }
 
   getCurrentEpoch() async {
@@ -311,6 +319,179 @@ class ZkLoginProvider extends ChangeNotifier {
     } catch (e) {
       if (context.mounted) {
         showSnackBar(context, e.toString(), seconds: 6);
+      }
+    } finally {
+      requesting = false;
+    }
+    return digest;
+  }
+
+  Future<String?> executeGetComponent(BuildContext context) async {
+    String? digest;
+    try {
+      if (requesting) return digest;
+      requesting = true;
+      final txb = TransactionBlock();
+      txb.setSenderIfNotSet(address);
+      final coin = txb.splitCoins(txb.gas, [txb.pureInt(22222)]);
+      txb.transferObjects([coin], txb.pureAddress(address));
+
+      txb.moveCall('$packageObjectId::dbio::get_components',
+          arguments: [txb.pure(dbio)]);
+
+      final sign = await txb.sign(
+        SignOptions(
+          signer: account!.keyPair,
+          client: suiClient,
+        ),
+      );
+      final jwtJson = decodeJwt(jwt);
+      final addressSeed = genAddressSeed(
+        BigInt.parse(salt),
+        'sub',
+        jwtJson['sub'].toString(),
+        jwtJson['aud'].toString(),
+      );
+      zkProof["addressSeed"] = addressSeed.toString();
+      print('sign.signature: ${sign.signature}');
+      print('maxEpoch: ${maxEpoch}');
+      print('new epoch: ${await getCurrentEpoch()}');
+      final zkSign = getZkLoginSignature(
+        ZkLoginSignature(
+          inputs: ZkLoginSignatureInputs.fromJson(zkProof),
+          maxEpoch: maxEpoch,
+          userSignature: base64Decode(sign.signature),
+        ),
+      );
+      final resp = await suiClient.executeTransactionBlock(
+        sign.bytes,
+        [zkSign],
+        options: SuiTransactionBlockResponseOptions(
+            showEffects: true, showEvents: true),
+        requestType: ExecuteTransaction.WaitForLocalExecution,
+      );
+      if (resp.confirmedLocalExecution == true) {
+        var events = resp.events;
+        print('events.length: ${events.length}');
+        for (SuiEvent suiEvent in events) {
+          print('suiEvent.parsedJson: ${suiEvent.parsedJson}');
+        }
+        digest = resp.digest;
+        print('resp.digest: ${resp.digest}');
+        getBalance();
+      } else {
+        if (context.mounted) {
+          showSnackBar(context, "Transaction Send Failed");
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        print('error: ${e.toString()}');
+        showSnackBar(context, "${e.toString()}", seconds: 6);
+        rethrow;
+      }
+    } finally {
+      requesting = false;
+    }
+    return digest;
+  }
+
+  Future<String?> executeMintAndTake(BuildContext context) async {
+    String? digest;
+    try {
+      if (requesting) return digest;
+      requesting = true;
+      final txb = TransactionBlock();
+      txb.setSenderIfNotSet(address);
+      final coin = txb.splitCoins(txb.gas, [txb.pureInt(22222)]);
+      txb.transferObjects([coin], txb.pureAddress(address));
+
+      txb.moveCall('$packageObjectId::dbio::mint_and_take', arguments: [
+        txb.pureString('name'),
+        txb.pureString('description'),
+        txb.pureString('image_url'),
+        txb.pureString('link'),
+        txb.pure(dbio)
+      ]);
+
+      final sign = await txb.sign(
+        SignOptions(
+          signer: account!.keyPair,
+          client: suiClient,
+        ),
+      );
+      final jwtJson = decodeJwt(jwt);
+      final addressSeed = genAddressSeed(
+        BigInt.parse(salt),
+        'sub',
+        jwtJson['sub'].toString(),
+        jwtJson['aud'].toString(),
+      );
+      zkProof["addressSeed"] = addressSeed.toString();
+      print('sign.signature: ${sign.signature}');
+      print('maxEpoch: ${maxEpoch}');
+      print('new epoch: ${await getCurrentEpoch()}');
+      final zkSign = getZkLoginSignature(
+        ZkLoginSignature(
+          inputs: ZkLoginSignatureInputs.fromJson(zkProof),
+          maxEpoch: maxEpoch,
+          userSignature: base64Decode(sign.signature),
+        ),
+      );
+      final resp = await suiClient.executeTransactionBlock(
+        sign.bytes,
+        [zkSign],
+        options: SuiTransactionBlockResponseOptions(showEffects: true),
+        requestType: ExecuteTransaction.WaitForLocalExecution,
+      );
+      if (resp.confirmedLocalExecution == true) {
+        digest = resp.digest;
+        print('resp.digest: ${resp.digest}');
+        getBalance();
+      } else {
+        if (context.mounted) {
+          showSnackBar(context, "Transaction Send Failed");
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        print('error: ${e.toString()}');
+        showSnackBar(context, "${e.toString()}", seconds: 6);
+        rethrow;
+      }
+    } finally {
+      requesting = false;
+    }
+    return digest;
+  }
+
+  Future<String?> executeGetUserComponents(
+      BuildContext context, String address) async {
+    String? digest;
+    SuiAccount suiAccount = SuiAccount.fromMnemonics(
+        "used gentle rose curve alone force mistake vault butter solution carbon blossom",
+        SignatureScheme.Ed25519);
+    SuiAddress suiAddress = suiAccount.getAddress();
+    try {
+      if (requesting) return digest;
+      requesting = true;
+      final txb = TransactionBlock();
+      txb.setSenderIfNotSet(suiAddress);
+      final coin = txb.splitCoins(txb.gas, [txb.pureInt(22222)]);
+      txb.transferObjects([coin], txb.pureAddress(suiAddress));
+
+      txb.moveCall('$packageObjectId::dbio::get_user_components',
+          arguments: [txb.pureAddress(suiAddress), txb.pure(dbio)]);
+
+      final result =
+          await suiClient.signAndExecuteTransactionBlock(suiAccount, txb);
+      digest = result.digest;
+      print('result.digest: ${result.digest}');
+    } catch (e) {
+      if (context.mounted) {
+        print('error: ${e.toString()}');
+        showSnackBar(context, "${e.toString()}", seconds: 6);
+        rethrow;
       }
     } finally {
       requesting = false;
